@@ -5,7 +5,7 @@ import time
 
 MAX_INDUCTION_LENGTH = 30
 targetRetentionRate = 0.85
-sampleThreshold = 20
+sampleThreshold = 10
 sampleDays = 60
 
 
@@ -40,7 +40,7 @@ for cid, cidRevList in revlogList.items():
     lastLearnEnd = None
     for i in range(len(cidRevList) - 1, -1, -1):
         (rtype, ease, lastIvl, rtime) = cidRevList[i]
-        if rtype in (0, 3):
+        if rtype == 0:
             lastLearnEnd = i + 1
             break
     if lastLearnEnd is None:
@@ -50,7 +50,7 @@ for cid, cidRevList in revlogList.items():
 
     lastLearnBegin = 0
     for i in range(lastLearnEnd - 1, -1, -1):
-        if cidRevList[i][0] not in (0, 3):
+        if cidRevList[i][0] != 0:
             lastLearnBegin = i
             break
 

@@ -1,0 +1,4 @@
+{
+  "targetRetentionRate": 0.85,
+  "sampleDays": 60
+}
