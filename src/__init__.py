@@ -6,14 +6,8 @@
 # License: GNU AGPL, version 3 or later;
 # See http://www.gnu.org/licenses/agpl.html
 
-from aqt.editor import Editor
-from anki.hooks import wrap
-from aqt.utils import askUser
+from .ivlBoost import initIntervalTable
+from . import sched1_hook
+from anki.hooks import addHook
 
-def onLoadNote(self, focusTo=None):
-    pass
-
-
-Editor.loadNote = wrap(Editor.loadNote, onLoadNote, "after")
-
-
+addHook("profileLoaded", initIntervalTable)
