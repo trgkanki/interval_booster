@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import math
 
 revlog = []
 with open('trgk.json', 'r') as f:
@@ -16,8 +17,11 @@ for rl in revlog:
     revlogList[cid].append((rtype, ease, lastIvl, rtime))
 
 MAX_INDUCTION_LENGTH = 30
-firstReviewRight = [0] * MAX_INDUCTION_LENGTH
-firstReviewWrong = [0] * MAX_INDUCTION_LENGTH
+
+targetRetentionRate = 0.85
+
+firstReviewsAfterLearning = [[] for _ in range(MAX_INDUCTION_LENGTH)]
+
 t = 0
 for cid, cidRevList in revlogList.items():
     lastLearnEnd = None
@@ -37,29 +41,53 @@ for cid, cidRevList in revlogList.items():
             lastLearnBegin = i
             break
 
-    learnCount = lastLearnEnd - lastLearnBegin
-    if learnCount >= MAX_INDUCTION_LENGTH:
+    inductionLength = lastLearnEnd - lastLearnBegin
+    if inductionLength >= MAX_INDUCTION_LENGTH:
         continue
 
     firstReviewEase = cidRevList[lastLearnEnd][1]
-    firstReviewDelay = (
-        (cidRevList[lastLearnEnd][3] - cidRevList[lastLearnEnd - 1][3]) / 1000 / 86400
-        / cidRevList[lastLearnEnd][2]
-    )
+    timeSinceLastCorrect = (cidRevList[lastLearnEnd][3] - cidRevList[lastLearnEnd - 1][3]) / 1000 / 86400
+    calculatedInterval = cidRevList[lastLearnEnd][2]
+
+    # Ignore too-much advanced review / delayed reviews
+    firstReviewDelay = timeSinceLastCorrect / calculatedInterval
     if firstReviewDelay > 1.1 or firstReviewDelay < 0.9:
-        continue  # too off-interval
-
-    if firstReviewEase == 1:
-        firstReviewWrong[learnCount] += 1
-    else:
-        firstReviewRight[learnCount] += 1
-
-for inductionLength in range(20):
-    totRev =  (firstReviewRight[inductionLength] + firstReviewWrong[inductionLength])
-    if totRev == 0:
         continue
-    rightRev = firstReviewRight[inductionLength]
-    print('Right with %2d induction: %.3f (%d samples)' % (inductionLength, rightRev / totRev, totRev))
+
+    # e^k(calculatedInterval) = targetRetentionRate
+    # (expected retention rate) = e^k(timeSinceLastCorrect) = targetRetentionRate ^ (timeSinceLastCorrect / calculatedInterval)
+    expectedRetentionRate = targetRetentionRate ** (timeSinceLastCorrect / calculatedInterval)
+    firstReviewsAfterLearning[inductionLength].append((
+        firstReviewEase != 1,
+        expectedRetentionRate,
+        timeSinceLastCorrect
+    ))
+
+newIntervalMultiplier = [0] * MAX_INDUCTION_LENGTH
+for inductionLength in range(MAX_INDUCTION_LENGTH):
+    frLog = firstReviewsAfterLearning[inductionLength]
+    if not frLog:
+        continue
+
+    # If current interval is well-calcualted, avg should be 1
+    #   : (1 / expectedRetentionRate) added with (realRetentionRate) probability
+    #   :           0         added with (1 - realRetentionRate) probability
+    # so if avg deviates from 1, it means that retention rate is either too much or too less expected.
+    avg = sum(1 / expectedRetentionRate if correct else 0 for correct, expectedRetentionRate, timeSinceLastCorrect in frLog) / len(frLog)
+
+    # avg = realRetentionRate / expectedRetentionRate
+    # realRetentionRate = expectedRetentionRate * avg
+    # if avg is too high, then realRetentionRate is higher than expected.
+    #   → need to deviate timeSinceLastCorrect a bit!
+
+    # goal: expectedRetentionRate = targetRetentionRate
+    # retention rate at 'timeSinceLastCorrect' = expectedRetentionRate * avg = targetRetentionRate * avg
+    # e^(k * newInterval) = targetRetentionRate
+    # e^(k * timeSinceLastCorrect) = targetRetentionRate * avg
+    # ln(targetRetentionRate) / newInterval = ln(targetRetentionRate * avg) / timeSinceLastCorrect
+    # newInterval = timeSinceLastCorrect * ln(targetRetentionRate) / ln(targetRetentionRate * avg)
+    newInterval = sum(l[2] for l in frLog) / len(frLog) * math.log(targetRetentionRate) / math.log(targetRetentionRate * avg)
+    print('Right with %2d induction: avg %.3f, newInterval %.3f (%d samples)' % (inductionLength, avg, newInterval, len(frLog)))
 
 
 # -- revlog is a review history; it has a row for every review you've ever done!
