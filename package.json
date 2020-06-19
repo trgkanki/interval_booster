@@ -1,6 +1,6 @@
 {
   "name": "addon_template",
-  "version": "20.5.4i8",
+  "version": "20.6.19i24",
   "description": "template for trgkanki's addon",
   "scripts": {
     "build": "",
