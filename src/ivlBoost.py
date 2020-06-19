@@ -103,6 +103,11 @@ def collectFirstReviewsByInductionLength(col, cidRevlogDict):
 
         firstReviewEase = cidRevList[lastLearnEnd][1]
         daysSinceInduction = cidRevList[lastLearnEnd][3] - cidRevList[lastLearnEnd - 1][3]
+
+        # First review on the same day as today. Outlier.
+        if daysSinceInduction == 0:
+            continue
+
         ret[inductionLength].append((
             firstReviewEase != 1,
             daysSinceInduction
