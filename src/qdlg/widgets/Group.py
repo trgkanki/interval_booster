@@ -13,18 +13,20 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# -*- coding: utf-8 -*-
-#
-# induction_booster v20.5.4i8
-#
-# Copyright: trgk (phu54321@naver.com)
-# License: GNU AGPL, version 3 or later;
-# See http://www.gnu.org/licenses/agpl.html
+from ..stack import qDlgStackTop
+from ..utils import addLayoutOrWidget
+from ..container import QDlgContainer
 
-from .ivlBoost import initIntervalTable
-from . import sched1_hook
-from anki.hooks import addHook
-from .utils import openChangelog
-from .utils import uuid  # duplicate UUID checked here
+from PyQt5.Qt import QGroupBox, QVBoxLayout
 
-addHook("profileLoaded", initIntervalTable)
+
+class Group(QDlgContainer):
+    def __init__(self, title: str):
+        self.groupBox = QGroupBox(title)
+        self.layout = QVBoxLayout()
+        self.groupBox.setLayout(self.layout)
+        qDlgStackTop().addChild(self.groupBox)
+
+    def addChild(self, child):
+        addLayoutOrWidget(self.layout, child)
+        return self

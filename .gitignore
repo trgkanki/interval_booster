@@ -421,6 +421,9 @@ $RECYCLE.BIN/
 
 # anki_template
 dist.zip
+dist_*.zip
+*.ankiaddon
+
 meta.json
 
 # gitignore testing zone

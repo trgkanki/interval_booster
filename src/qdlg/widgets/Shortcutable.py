@@ -13,18 +13,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# -*- coding: utf-8 -*-
-#
-# induction_booster v20.5.4i8
-#
-# Copyright: trgk (phu54321@naver.com)
-# License: GNU AGPL, version 3 or later;
-# See http://www.gnu.org/licenses/agpl.html
+from PyQt5.Qt import QKeySequence
 
-from .ivlBoost import initIntervalTable
-from . import sched1_hook
-from anki.hooks import addHook
-from .utils import openChangelog
-from .utils import uuid  # duplicate UUID checked here
 
-addHook("profileLoaded", initIntervalTable)
+class Shortcutable:
+    def shortcut(self, keySequence: str):
+        kSeq = QKeySequence(keySequence)
+        self.widget.setShortcut(kSeq)
+        self.widget.setToolTip(kSeq.toString())
+        return self
+
+    def default(self):
+        self.widget.setDefault(True)
+        return self

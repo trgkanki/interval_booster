@@ -13,18 +13,18 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# -*- coding: utf-8 -*-
-#
-# induction_booster v20.5.4i8
-#
-# Copyright: trgk (phu54321@naver.com)
-# License: GNU AGPL, version 3 or later;
-# See http://www.gnu.org/licenses/agpl.html
+from ..stack import qDlgStackTop
+from .Style import StylableWidget
 
-from .ivlBoost import initIntervalTable
-from . import sched1_hook
-from anki.hooks import addHook
-from .utils import openChangelog
-from .utils import uuid  # duplicate UUID checked here
+from PyQt5.Qt import QLabel
 
-addHook("profileLoaded", initIntervalTable)
+
+class Text(StylableWidget):
+    def __init__(self, text):
+        super().__init__()
+        self.widget = QLabel(text)
+        qDlgStackTop().addChild(self.widget)
+
+    def wordWrap(self, enabled):
+        self.widget.setWordWrap(enabled)
+        return self

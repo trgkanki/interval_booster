@@ -13,18 +13,26 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# -*- coding: utf-8 -*-
-#
-# induction_booster v20.5.4i8
-#
-# Copyright: trgk (phu54321@naver.com)
-# License: GNU AGPL, version 3 or later;
-# See http://www.gnu.org/licenses/agpl.html
+import sys
+from qdlgproxy import (  # type: ignore
+    QDlg,
+    Button,
+)
+from PyQt5.Qt import QApplication
 
-from .ivlBoost import initIntervalTable
-from . import sched1_hook
-from anki.hooks import addHook
-from .utils import openChangelog
-from .utils import uuid  # duplicate UUID checked here
 
-addHook("profileLoaded", initIntervalTable)
+@QDlg("OK/reject test")
+def qDlgClass(dlg):
+    Button("OK").onClick(dlg.accept)
+    Button("Cancel").onClick(dlg.reject)
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    print(qDlgClass.run())
+    print(qDlgClass.run())
+
+
+def test_wrong():
+    ## This test shouldn't be run by nosetests
+    assert False

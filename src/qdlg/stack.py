@@ -13,18 +13,31 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# -*- coding: utf-8 -*-
-#
-# induction_booster v20.5.4i8
-#
-# Copyright: trgk (phu54321@naver.com)
-# License: GNU AGPL, version 3 or later;
-# See http://www.gnu.org/licenses/agpl.html
+import threading
 
-from .ivlBoost import initIntervalTable
-from . import sched1_hook
-from anki.hooks import addHook
-from .utils import openChangelog
-from .utils import uuid  # duplicate UUID checked here
+local = threading.local()
 
-addHook("profileLoaded", initIntervalTable)
+
+def getQDlgStack():
+    try:
+        return local.qDlgStack
+    except AttributeError:
+        local.qDlgStack = []
+        return local.qDlgStack
+
+
+def pushQDlgStack(el):
+    getQDlgStack().append(el)
+
+
+def popQDlgStack(el):
+    lastEl = getQDlgStack().pop()
+    assert lastEl == el
+
+
+def qDlgStackTop():
+    return getQDlgStack()[-1]
+
+
+def qDlgStackGetDialog():
+    return getQDlgStack()[0]

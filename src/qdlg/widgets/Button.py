@@ -13,18 +13,20 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# -*- coding: utf-8 -*-
-#
-# induction_booster v20.5.4i8
-#
-# Copyright: trgk (phu54321@naver.com)
-# License: GNU AGPL, version 3 or later;
-# See http://www.gnu.org/licenses/agpl.html
+from ..stack import qDlgStackTop
+from .Style import StylableWidget
+from .Shortcutable import Shortcutable
 
-from .ivlBoost import initIntervalTable
-from . import sched1_hook
-from anki.hooks import addHook
-from .utils import openChangelog
-from .utils import uuid  # duplicate UUID checked here
+from PyQt5.Qt import QPushButton, QKeySequence
 
-addHook("profileLoaded", initIntervalTable)
+
+class Button(StylableWidget, Shortcutable):
+    def __init__(self, label):
+        super().__init__()
+        self.widget = QPushButton(label)
+        self.widget.setAutoDefault(False)
+        qDlgStackTop().addChild(self.widget)
+
+    def onClick(self, callback):
+        self.widget.clicked.connect(callback)
+        return self
