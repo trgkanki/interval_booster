@@ -24,7 +24,6 @@
 from .utils import openChangelog
 from .utils import uuid  # duplicate UUID checked here
 
-from aqt import mw
 from aqt.utils import tooltip
 
 from anki.sched import Scheduler as SchedulerV1
@@ -37,11 +36,7 @@ from .revlog.initialIvl import initialIvl
 from .consts import CARD_TYPE_NEW, CARD_TYPE_LRN, CARD_TYPE_REV
 
 
-def init():
-    createRevlogMap(mw.col)
-
-
-addHook("profileLoaded", init)
+addHook("profileLoaded", createRevlogMap)
 
 
 # Yeah two duplicate function only because of

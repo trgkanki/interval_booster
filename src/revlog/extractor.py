@@ -3,15 +3,17 @@ import math
 from collections import namedtuple
 from ..utils.log import log
 
+import aqt
+
 RevlogEntry = namedtuple("RevlogEntry", ["reviewType", "ease", "epoch"])
 
 _revlogMap = {}
 
 
-def createRevlogMap(col):
+def createRevlogMap():
     global _revlogMap
     _revlogMap = {}
-    rows = col.db.all("select * from revlog order by id ASC")
+    rows = aqt.mw.col.db.all("select * from revlog order by id ASC")
 
     for row in rows:
         epoch, cid, usn, ease, ivl, lastIvl, factor, duration, reviewType = row
