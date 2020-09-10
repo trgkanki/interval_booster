@@ -21,10 +21,16 @@
 # License: GNU AGPL, version 3 or later;
 # See http://www.gnu.org/licenses/agpl.html
 
-from .ivlBoost import initIntervalTable
+from .revlog.extractor import createRevlogMap
 from . import sched1_hook
+from aqt import mw
 from anki.hooks import addHook
 from .utils import openChangelog
 from .utils import uuid  # duplicate UUID checked here
 
-addHook("profileLoaded", initIntervalTable)
+
+def init():
+    createRevlogMap(mw.col)
+
+
+addHook("profileLoaded", init)
