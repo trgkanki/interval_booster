@@ -24,8 +24,6 @@
 from .utils import openChangelog
 from .utils import uuid  # duplicate UUID checked here
 
-from aqt.utils import tooltip
-
 from anki.sched import Scheduler as SchedulerV1
 from anki.schedv2 import Scheduler as SchedulerV2
 from anki.hooks import wrap, addHook
