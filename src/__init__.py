@@ -37,7 +37,7 @@ from .consts import CARD_TYPE_NEW, CARD_TYPE_LRN, CARD_TYPE_REV
 addHook("profileLoaded", createRevlogMap)
 
 
-# Yeah two duplicate function only because of
+## Initial interval setter
 def newGraduatingIvl(self, card, conf, early, adjOrFuzz, *, _old=None):
     if card.type in (CARD_TYPE_NEW, CARD_TYPE_LRN):
         return initialIvl(card.id)
@@ -61,6 +61,9 @@ SchedulerV2._graduatingIvl = wrap(
 )
 
 
+## Young card booser
+
+
 def newRevConf(self, card, *, _old=None):
     conf = _old(self, card)
     if card.ivl <= 30:
@@ -71,6 +74,5 @@ def newRevConf(self, card, *, _old=None):
     return conf
 
 
-# TODO: add scheduler V2 support
 SchedulerV1._revConf = wrap(SchedulerV1._revConf, newRevConf, "around")
 SchedulerV2._revConf = wrap(SchedulerV2._revConf, newRevConf, "around")
