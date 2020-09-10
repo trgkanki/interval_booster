@@ -73,3 +73,4 @@ def newRevConf(self, card, *, _old=None):
 
 # TODO: add scheduler V2 support
 SchedulerV1._revConf = wrap(SchedulerV1._revConf, newRevConf, "around")
+SchedulerV2._revConf = wrap(SchedulerV2._revConf, newRevConf, "around")
