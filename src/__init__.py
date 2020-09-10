@@ -21,12 +21,18 @@
 # License: GNU AGPL, version 3 or later;
 # See http://www.gnu.org/licenses/agpl.html
 
-from .revlog.extractor import createRevlogMap
-from . import sched1_hook
-from aqt import mw
-from anki.hooks import addHook
 from .utils import openChangelog
 from .utils import uuid  # duplicate UUID checked here
+
+from aqt import mw
+from aqt.utils import tooltip
+
+from anki.sched import Scheduler as SchedulerV1
+from anki.schedv2 import Scheduler as SchedulerV2
+from anki.hooks import wrap, addHook
+
+from .revlog.extractor import createRevlogMap
+from .revlog.initialIvl import initialIvl
 
 
 def init():
@@ -34,3 +40,46 @@ def init():
 
 
 addHook("profileLoaded", init)
+
+
+CARD_TYPE_NEW = 0
+CARD_TYPE_LRN = 1
+CARD_TYPE_REVIEW = 2
+
+
+# Yeah two duplicate function only because of
+def newGraduatingIvl(self, card, conf, early, adjOrFuzz, *, _old=None):
+    if card.type in (CARD_TYPE_NEW, CARD_TYPE_LRN):
+        return initialIvl(card.id)
+
+    return _old(self, card, conf, early, adjOrFuzz)
+
+
+def newGraduatingIvl1(self, card, conf, early, adj=True, *, _old=None):
+    return newGraduatingIvl(self, card, conf, early, adj, _old=_old)
+
+
+def newGraduatingIvl2(self, card, conf, early, fuzz=True, *, _old=None):
+    return newGraduatingIvl(self, card, conf, early, fuzz, _old=_old)
+
+
+SchedulerV1._graduatingIvl = wrap(
+    SchedulerV1._graduatingIvl, newGraduatingIvl1, "around"
+)
+SchedulerV2._graduatingIvl = wrap(
+    SchedulerV2._graduatingIvl, newGraduatingIvl2, "around"
+)
+
+
+def newRevConf(self, card, *, _old=None):
+    conf = _old(self, card)
+    if card.ivl <= 30:
+        conf["ivlFct"] = 2
+    else:
+        conf["ivlFct"] = 1
+
+    return conf
+
+
+# TODO: add scheduler V2 support
+SchedulerV1._revConf = wrap(SchedulerV1._revConf, newRevConf, "around")

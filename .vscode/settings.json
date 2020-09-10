@@ -1,7 +1,9 @@
 {
   "python.linting.enabled": true,
   "cSpell.words": [
-    "jssrc"
+    "jssrc",
+    "sched",
+    "schedv"
   ],
   "licenser.license": "AGPLv3"
 }
