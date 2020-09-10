@@ -34,17 +34,14 @@ from anki.hooks import wrap, addHook
 from .revlog.extractor import createRevlogMap
 from .revlog.initialIvl import initialIvl
 
+from .consts import CARD_TYPE_NEW, CARD_TYPE_LRN, CARD_TYPE_REV
+
 
 def init():
     createRevlogMap(mw.col)
 
 
 addHook("profileLoaded", init)
-
-
-CARD_TYPE_NEW = 0
-CARD_TYPE_LRN = 1
-CARD_TYPE_REVIEW = 2
 
 
 # Yeah two duplicate function only because of

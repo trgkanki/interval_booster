@@ -4,6 +4,8 @@ from ..utils.configrw import getConfig
 from ..utils.log import log
 from .extractor import getRevlogMap
 
+from ..consts import REVLOG_TYPE_NEW
+
 import math
 import time
 import collections
@@ -13,9 +15,6 @@ MAX_INDUCTION_LENGTH = 30
 g_sampleThreshold = 10
 
 _initialIvlTable = None
-
-
-REVLOG_TYPE_NEW = 0
 
 
 # ------------------------
