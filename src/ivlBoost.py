@@ -124,6 +124,7 @@ def calculateInductionIntervalTable(col, firstReviewTable):
     print('Total %d samples' % totSamplecount)
     for inductionLength in range(MAX_INDUCTION_LENGTH):
         frLog = firstReviewTable[inductionLength][:]
+        frLog = [x for x in frLog if x[1] != 0]
         if len(frLog) < g_sampleThreshold:
             continue
 
