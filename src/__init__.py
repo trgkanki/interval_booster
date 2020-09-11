@@ -24,6 +24,8 @@
 from .utils import openChangelog
 from .utils import uuid  # duplicate UUID checked here
 
+from .utils.log import log
+
 from anki.sched import Scheduler as SchedulerV1
 from anki.schedv2 import Scheduler as SchedulerV2
 from anki.hooks import wrap, addHook
@@ -40,7 +42,9 @@ addHook("profileLoaded", createRevlogMap)
 ## Initial interval setter
 def newGraduatingIvl(self, card, conf, early, adjOrFuzz, *, _old=None):
     if card.type in (CARD_TYPE_NEW, CARD_TYPE_LRN):
-        return initialIvl(card.id)
+        initialInterval = initialIvl(card.id)
+        log("initial boost: cid=%d, initialInterval=%d" % (card.id, initialInterval))
+        return initialInterval
 
     return _old(self, card, conf, early, adjOrFuzz)
 
@@ -68,6 +72,7 @@ def newRevConf(self, card, *, _old=None):
     conf = _old(self, card)
     if card.ivl <= 30:
         conf["ivlFct"] = 2
+        log("young card boost: cid=%d" % card.id)
     else:
         conf["ivlFct"] = 1
 
