@@ -39,12 +39,10 @@ def invalidateInitialIvlTable():
     _initialIvlTable = None
 
 
-def initialIvl(cid):
+def initialIvl(revlogList):
     _initInitialIvlTable()
 
-    col = mw.col
     inductionLength = 1
-    revlogList = getRevlogMap([cid])[cid]
     for log in revlogList[::-1]:
         if log.reviewType == REVLOG_TYPE_NEW:
             inductionLength += 1
@@ -59,9 +57,7 @@ def initialIvl(cid):
 
 def cutoffOldRevlog(col, sampleDays, revlogMap):
     # Don't consider too old cards
-    epochMidnightAdjust = col.crt % 86400
-    daysSinceEpoch = math.floor((time.time() - epochMidnightAdjust) / 86400)
-    oldCutoffTime = daysSinceEpoch - sampleDays
+    oldCutoffTime = col.sched.today - sampleDays
 
     for cid in list(revlogMap.keys()):  # keys() may change by del cidRevlogList[cid]
         firstLrnTime = revlogMap[cid][0].epoch

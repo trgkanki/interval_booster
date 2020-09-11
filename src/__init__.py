@@ -30,7 +30,8 @@ from anki.sched import Scheduler as SchedulerV1
 from anki.schedv2 import Scheduler as SchedulerV2
 from anki.hooks import wrap, addHook
 
-from .revlog.initialIvl import initialIvl, invalidateInitialIvlTable
+from .revlog.initialIvl import invalidateInitialIvlTable
+from .revlog.booster import boostCard
 
 from .consts import CARD_TYPE_NEW, CARD_TYPE_LRN, CARD_TYPE_REV
 
@@ -38,45 +39,19 @@ from .consts import CARD_TYPE_NEW, CARD_TYPE_LRN, CARD_TYPE_REV
 addHook("profileLoaded", invalidateInitialIvlTable)
 
 
-## Initial interval setter
-def newGraduatingIvl(self, card, conf, early, adjOrFuzz, *, _old=None):
-    if card.type in (CARD_TYPE_NEW, CARD_TYPE_LRN):
-        initialInterval = initialIvl(card.id)
-        log("initial boost: cid=%d, initialInterval=%d" % (card.id, initialInterval))
-        return initialInterval
-
-    return _old(self, card, conf, early, adjOrFuzz)
+def newLogRev(self, card, ease, delay, type, _old):
+    _old(self, card, ease, delay, type)
+    boostCard(self.col, card)
 
 
-def newGraduatingIvl1(self, card, conf, early, adj=True, *, _old=None):
-    return newGraduatingIvl(self, card, conf, early, adj, _old=_old)
+SchedulerV1._logRev = wrap(SchedulerV1._logRev, newLogRev, "around")
+SchedulerV2._logRev = wrap(SchedulerV2._logRev, newLogRev, "around")
 
 
-def newGraduatingIvl2(self, card, conf, early, fuzz=True, *, _old=None):
-    return newGraduatingIvl(self, card, conf, early, fuzz, _old=_old)
+def newLogLrn(self, card, ease, conf, leaving, type, lastLeft, _old):
+    _old(self, card, ease, conf, leaving, type, lastLeft)
+    boostCard(self.col, card)
 
 
-SchedulerV1._graduatingIvl = wrap(
-    SchedulerV1._graduatingIvl, newGraduatingIvl1, "around"
-)
-SchedulerV2._graduatingIvl = wrap(
-    SchedulerV2._graduatingIvl, newGraduatingIvl2, "around"
-)
-
-
-## Young card booser
-
-
-def newRevConf(self, card, *, _old=None):
-    conf = _old(self, card)
-    if card.ivl <= 30:
-        conf["ivlFct"] = 2
-        log("young card boost: cid=%d" % card.id)
-    else:
-        conf["ivlFct"] = 1
-
-    return conf
-
-
-SchedulerV1._revConf = wrap(SchedulerV1._revConf, newRevConf, "around")
-SchedulerV2._revConf = wrap(SchedulerV2._revConf, newRevConf, "around")
+SchedulerV1._logLrn = wrap(SchedulerV1._logLrn, newLogLrn, "around")
+SchedulerV2._logLrn = wrap(SchedulerV2._logLrn, newLogLrn, "around")

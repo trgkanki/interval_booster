@@ -2,6 +2,8 @@
   "python.linting.enabled": true,
   "cSpell.words": [
     "jssrc",
+    "odid",
+    "resched",
     "sched",
     "schedv"
   ],
