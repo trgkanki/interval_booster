@@ -44,10 +44,9 @@ def initialIvl(cid):
 
     col = mw.col
     inductionLength = 1
-    for (reviewType,) in col.db.all(
-        "select type from revlog where cid = ? order by id DESC", cid
-    ):
-        if reviewType == REVLOG_TYPE_NEW:
+    revlogList = getRevlogMap([cid])[cid]
+    for log in revlogList[::-1]:
+        if log.reviewType == REVLOG_TYPE_NEW:
             inductionLength += 1
         else:
             break

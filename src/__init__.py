@@ -30,13 +30,12 @@ from anki.sched import Scheduler as SchedulerV1
 from anki.schedv2 import Scheduler as SchedulerV2
 from anki.hooks import wrap, addHook
 
-from .revlog.extractor import createRevlogMap
-from .revlog.initialIvl import initialIvl
+from .revlog.initialIvl import initialIvl, invalidateInitialIvlTable
 
 from .consts import CARD_TYPE_NEW, CARD_TYPE_LRN, CARD_TYPE_REV
 
 
-addHook("profileLoaded", createRevlogMap)
+addHook("profileLoaded", invalidateInitialIvlTable)
 
 
 ## Initial interval setter
