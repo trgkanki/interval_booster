@@ -1,6 +1,9 @@
 from .extractor import getRevlogMap
 from .initialIvl import initialIvl
+
 from ..utils.log import log
+from ..utils.configrw import getConfig
+
 from ..consts import (
     REVLOG_TYPE_NEW,
     REVLOG_TYPE_REVIEW,

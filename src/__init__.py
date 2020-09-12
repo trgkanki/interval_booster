@@ -35,6 +35,7 @@ from .revlog.initialIvl import invalidateInitialIvlTable
 from .revlog.booster import boostCard
 from .revlog.extractor import getRevlogMap
 
+from .deckWhitelist import isDeckWhitelisted
 from aqt import mw
 
 from .consts import CARD_TYPE_NEW, CARD_TYPE_LRN, CARD_TYPE_REV
@@ -80,8 +81,8 @@ def onProfileLoaded():
 
         for cid in cardIds:
             card = col.getCard(cid)
-            # TODO: filter by selected deck
-            boostCard(col, card)
+            if isDeckWhitelisted(card.did):
+                boostCard(col, card)
 
         _lastProcessedRevlogId = max(_id for _id, cid in rows)
         setConfig("_lastProcessedRevlogId", _lastProcessedRevlogId)
