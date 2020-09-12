@@ -81,10 +81,11 @@ def onProfileLoaded():
         cardIds = set(cid for _id, cid in rows)  # Select unique cardIds
         log("Rescheduling %d new reviews on startup" % len(cardIds))
 
+        revlogMap = getRevlogMap()
         for cid in cardIds:
             card = col.getCard(cid)
             if isDeckWhitelisted(card.did):
-                boostCard(col, card)
+                boostCard(col, card, revlogMap)
 
         _lastProcessedRevlogId = max(_id for _id, cid in rows)
         setConfig("_lastProcessedRevlogId", _lastProcessedRevlogId)

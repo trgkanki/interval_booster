@@ -32,7 +32,7 @@ def rescheduleCard(col, card, newIvl):
     card.flush()
 
 
-def boostCard(col, card):
+def boostCard(col, card, revlogMap=None):
     # Ignore cards during custom study
     if card.odid:
         return
@@ -41,7 +41,7 @@ def boostCard(col, card):
         return
 
     cid = card.id
-    revlogList = getRevlogMap([cid])[cid]
+    revlogList = (revlogMap or getRevlogMap([cid]))[cid]
     lastReviewLog = revlogList[-1]
 
     # Ignore cards that have just finished custom studies
