@@ -21,28 +21,34 @@
 # License: GNU AGPL, version 3 or later;
 # See http://www.gnu.org/licenses/agpl.html
 
-from .utils import openChangelog
-from .utils import uuid  # duplicate UUID checked here
-from .utils.configrw import getConfig, setConfig
-
-from .utils.log import log
-
 from anki.sched import Scheduler as SchedulerV1
 from anki.schedv2 import Scheduler as SchedulerV2
 from anki.hooks import wrap, addHook
+
+from aqt import mw
+from aqt.qt import QAction
+from aqt.main import AnkiQt
+
+from .utils import uuid  # duplicate UUID checked here
+from .utils import openChangelog
+from .utils.configrw import getConfig, setConfig, setConfigEditor
+from .utils.log import log
 
 from .revlog.initialIvl import invalidateInitialIvlTable
 from .revlog.extractor import getRevlogMap
 from .booster import rescheduleWithInterval, getBoostedInterval
 
 from .deckWhitelist import isDeckWhitelisted
-from aqt import mw
-from aqt.qt import QAction
-
-from .consts import CARD_TYPE_NEW, CARD_TYPE_LRN, CARD_TYPE_REV
-from .utils.configrw import setConfigEditor
-from .configUI import configEditor
 from .boostSince import boostSince
+
+from .configUI import configEditor
+
+
+setConfigEditor(configEditor)
+
+
+## ----------------------------------------------------------------------------
+# Hooks for reviewer: new cards, reviewed cards
 
 
 def newLogRev(self, card, ease, delay, type, _old):
@@ -99,11 +105,28 @@ def onProfileLoaded():
         setConfig("_lastProcessedRevlogId", _lastProcessedRevlogId)
 
 
-addHook("profileLoaded", onProfileLoaded)
+# rather than using profileloaded, we hook up `loadProfile` instead.
+# This is due `profileLoaded` hook being called before sync.
+# Maybe one want to modify card content on other device, but this addon may
+# overwrite new interval BEFORE sync, effectively invalidating that modification.
+def newLoadProfile(self, onsuccess=None, *, _old):
+    def newOnSuccess():
+        if not self.col:
+            # Profile load failed for some reason
+            return
 
-setConfigEditor(configEditor)
+        onProfileLoaded()
+        if onsuccess():
+            onsuccess()
 
+    _old(self, newOnSuccess)
+
+
+AnkiQt.loadProfile = wrap(AnkiQt.loadProfile, newLoadProfile, "around")
+
+## ----------------------------------------------------------------------------
 # Add menu
+
 action = QAction("Interval boost for reviews since...", mw)
 action.triggered.connect(boostSince)
 mw.form.menuTools.addAction(action)
