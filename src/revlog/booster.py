@@ -16,9 +16,12 @@ import math
 
 
 def rescheduleCard(col, card, newIvl):
-    log(" - Rescheduling cid=%d: ivl %d->%d" % (card.id, card.ivl, newIvl))
     if card.ivl == newIvl:
-        log("  [ skipping: identical ivl ]")
+        # log("  [ skipping: identical ivl ]")
+        return
+
+    log(" - Rescheduling cid=%d: ivl %d->%d" % (card.id, card.ivl, newIvl))
+
     card.due = card.due - card.ivl + newIvl
     card.ivl = newIvl
     card.mod = intTime()
