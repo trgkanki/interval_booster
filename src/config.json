@@ -1,4 +1,5 @@
 {
-  "targetRetentionRate": 0.85,
-  "sampleDays": 60
+    "targetRetentionRate": 0.85,
+    "sampleDays": 60,
+    "_lastProcessedRevlogId": null
 }

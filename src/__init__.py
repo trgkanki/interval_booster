@@ -23,6 +23,7 @@
 
 from .utils import openChangelog
 from .utils import uuid  # duplicate UUID checked here
+from .utils.configrw import getConfig, setConfig
 
 from .utils.log import log
 
@@ -32,11 +33,11 @@ from anki.hooks import wrap, addHook
 
 from .revlog.initialIvl import invalidateInitialIvlTable
 from .revlog.booster import boostCard
+from .revlog.extractor import getRevlogMap
+
+from aqt import mw
 
 from .consts import CARD_TYPE_NEW, CARD_TYPE_LRN, CARD_TYPE_REV
-
-
-addHook("profileLoaded", invalidateInitialIvlTable)
 
 
 def newLogRev(self, card, ease, delay, type, _old):
@@ -55,3 +56,35 @@ def newLogLrn(self, card, ease, conf, leaving, type, lastLeft, _old):
 
 SchedulerV1._logLrn = wrap(SchedulerV1._logLrn, newLogLrn, "around")
 SchedulerV2._logLrn = wrap(SchedulerV2._logLrn, newLogLrn, "around")
+
+
+## ----------------------------------------------------------------------------
+
+
+def onProfileLoaded():
+    invalidateInitialIvlTable()
+
+    _lastProcessedRevlogId = getConfig("_lastProcessedRevlogId", None)
+    if _lastProcessedRevlogId is not None:
+        assert type(_lastProcessedRevlogId) in [int, float]
+
+        col = mw.col
+        rows = col.db.all(
+            "select id, cid from revlog where id > %f" % (_lastProcessedRevlogId)
+        )
+        if not rows:
+            return
+
+        cardIds = set(cid for _id, cid in rows)  # Select unique cardIds
+        log("Rescheduling %d new reviews on startup" % len(cardIds))
+
+        for cid in cardIds:
+            card = col.getCard(cid)
+            # TODO: filter by selected deck
+            boostCard(col, card)
+
+        _lastProcessedRevlogId = max(_id for _id, cid in rows)
+        setConfig("_lastProcessedRevlogId", _lastProcessedRevlogId)
+
+
+addHook("profileLoaded", onProfileLoaded)
