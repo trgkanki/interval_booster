@@ -1,10 +1,10 @@
-from .extractor import getRevlogMap
-from .initialIvl import initialIvl
+from .revlog.extractor import getRevlogMap
+from .revlog.initialIvl import initialIvl
 
-from ..utils.log import log
-from ..utils.configrw import getConfig
+from .utils.log import log
+from .utils.configrw import getConfig
 
-from ..consts import (
+from .consts import (
     REVLOG_TYPE_NEW,
     REVLOG_TYPE_REVIEW,
     REVLOG_TYPE_CRAM,
@@ -18,7 +18,7 @@ import random
 import math
 
 
-def rescheduleCard(col, card, newIvl):
+def rescheduleWithInterval(col, card, newIvl):
     if card.ivl == newIvl:
         # log("  [ skipping: identical ivl ]")
         return
@@ -32,7 +32,7 @@ def rescheduleCard(col, card, newIvl):
     card.flush()
 
 
-def boostCard(col, card, revlogMap=None):
+def getBoostedInterval(col, card, revlogMap=None):
     # Ignore cards during custom study
     if card.odid:
         return
@@ -63,7 +63,7 @@ def boostCard(col, card, revlogMap=None):
             log(
                 "initial boost: cid=%d, initialInterval=%d" % (card.id, initialInterval)
             )
-            rescheduleCard(col, card, initialInterval)
+            return initialInterval
         return
 
     # Young card interval booster
@@ -81,5 +81,5 @@ def boostCard(col, card, revlogMap=None):
             newInterval = random.randint(
                 math.ceil(targetInterval * 0.9), math.floor(targetInterval * 1.1)
             )
-            rescheduleCard(col, card, newInterval)
+            return newInterval
         return

@@ -43,8 +43,8 @@ from .utils.log import log
 import datetime
 
 from .deckWhitelist import isDeckWhitelisted
-from .revlog.booster import boostCard
 from .revlog.extractor import getRevlogMap
+from .booster import rescheduleWithInterval, getBoostedInterval
 
 
 @QDlg("Reschedule cards since...", (300, 300))
@@ -74,17 +74,24 @@ def boostSince():
         col = mw.col
 
         rows = col.db.all("select id, cid from revlog where id >= %d" % (since * 1000))
-        if not rows:
-            showInfo("No card needs rescheduling")
-            return
-
         cardIds = set(cid for _id, cid in rows)  # Select unique cardIds
-        if not askUser("%d card may need rescheduling. Proceed?" % len(cardIds)):
-            return
 
-        log("Rescheduling %d reviews: user request" % len(cardIds))
         revlogMap = getRevlogMap()
+        boostList = []
         for cid in cardIds:
             card = col.getCard(cid)
             if isDeckWhitelisted(col, card.did):
-                boostCard(col, card, revlogMap)
+                newIvl = getBoostedInterval(col, card)
+                if newIvl:
+                    boostList.append((card, newIvl))
+
+        if not boostList:
+            showInfo("No card needs rescheduling")
+            return
+
+        if not askUser("%d card may need rescheduling. Proceed?" % len(boostList)):
+            return
+
+        log("Rescheduling %d reviews: user request" % len(boostList))
+        for card, newIvl in boostList:
+            rescheduleWithInterval(col, card, newIvl)

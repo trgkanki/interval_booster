@@ -32,8 +32,8 @@ from anki.schedv2 import Scheduler as SchedulerV2
 from anki.hooks import wrap, addHook
 
 from .revlog.initialIvl import invalidateInitialIvlTable
-from .revlog.booster import boostCard
 from .revlog.extractor import getRevlogMap
+from .booster import rescheduleWithInterval, getBoostedInterval
 
 from .deckWhitelist import isDeckWhitelisted
 from aqt import mw
@@ -47,7 +47,9 @@ from .boostSince import boostSince
 
 def newLogRev(self, card, ease, delay, type, _old):
     _old(self, card, ease, delay, type)
-    boostCard(self.col, card)
+    newIvl = getBoostedInterval(self.col, card)
+    if newIvl:
+        rescheduleWithInterval(self.col, card, newIvl)
 
 
 SchedulerV1._logRev = wrap(SchedulerV1._logRev, newLogRev, "around")
@@ -56,7 +58,9 @@ SchedulerV2._logRev = wrap(SchedulerV2._logRev, newLogRev, "around")
 
 def newLogLrn(self, card, ease, conf, leaving, type, lastLeft, _old):
     _old(self, card, ease, conf, leaving, type, lastLeft)
-    boostCard(self.col, card)
+    newIvl = getBoostedInterval(self.col, card)
+    if newIvl:
+        rescheduleWithInterval(self.col, card, newIvl)
 
 
 SchedulerV1._logLrn = wrap(SchedulerV1._logLrn, newLogLrn, "around")
@@ -87,7 +91,9 @@ def onProfileLoaded():
         for cid in cardIds:
             card = col.getCard(cid)
             if isDeckWhitelisted(col, card.did):
-                boostCard(col, card, revlogMap)
+                newIvl = getBoostedInterval(col, card)
+                if newIvl:
+                    rescheduleWithInterval(col, card, newIvl)
 
         _lastProcessedRevlogId = max(_id for _id, cid in rows)
         setConfig("_lastProcessedRevlogId", _lastProcessedRevlogId)
