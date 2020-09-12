@@ -37,10 +37,12 @@ from .revlog.extractor import getRevlogMap
 
 from .deckWhitelist import isDeckWhitelisted
 from aqt import mw
+from aqt.qt import QAction
 
 from .consts import CARD_TYPE_NEW, CARD_TYPE_LRN, CARD_TYPE_REV
 from .utils.configrw import setConfigEditor
 from .configUI import configEditor
+from .boostSince import boostSince
 
 
 def newLogRev(self, card, ease, delay, type, _old):
@@ -84,7 +86,7 @@ def onProfileLoaded():
         revlogMap = getRevlogMap()
         for cid in cardIds:
             card = col.getCard(cid)
-            if isDeckWhitelisted(card.did):
+            if isDeckWhitelisted(col, card.did):
                 boostCard(col, card, revlogMap)
 
         _lastProcessedRevlogId = max(_id for _id, cid in rows)
@@ -94,3 +96,8 @@ def onProfileLoaded():
 addHook("profileLoaded", onProfileLoaded)
 
 setConfigEditor(configEditor)
+
+# Add menu
+action = QAction("Interval boost for reviews since...", mw)
+action.triggered.connect(boostSince)
+mw.form.menuTools.addAction(action)

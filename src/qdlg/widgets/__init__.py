@@ -18,6 +18,7 @@ from .layout import VStack, HStack  # NOQA\
 from .Text import Text  # NOQA
 from .Button import Button  # NOQA
 from .LineEdit import LineEdit  # NOQA
+from .Calendar import Calendar  # NOQA
 from .CheckBox import CheckBox  # NOQA
 from .RadioButton import RadioButton  # NOQA
 from .ListBox import ListBox  # NOQA

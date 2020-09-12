@@ -12,20 +12,20 @@ def isDeckWhitelisted(col, did):
     try:
         return _deckWhitelistCache[did]
     except KeyError:
-        _whitelistDecks = getConfig("whitelistDecks")
+        whitelistDecks = getConfig("whitelistDecks")
 
         # No whitelist → apply to all decks
-        if not _whitelistDecks:
+        if not whitelistDecks:
             _deckWhitelistCache[did] = True
             return True
 
         deckName = col.decks.get(did)["name"]
         shouldAccept = False
-        for whitelistDecks in whitelistDecks:
-            if deckName == whitelistDecks:
+        for whiteDeck in whitelistDecks:
+            if deckName == whiteDeck:
                 shouldAccept = True
                 break
-            elif deckName.startswith(whitelistDecks + "::"):
+            elif deckName.startswith(whiteDeck + "::"):
                 shouldAccept = True
                 break
 
