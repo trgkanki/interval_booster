@@ -39,6 +39,8 @@ from .deckWhitelist import isDeckWhitelisted
 from aqt import mw
 
 from .consts import CARD_TYPE_NEW, CARD_TYPE_LRN, CARD_TYPE_REV
+from .utils.configrw import setConfigEditor
+from .configUI import configEditor
 
 
 def newLogRev(self, card, ease, delay, type, _old):
@@ -89,3 +91,5 @@ def onProfileLoaded():
 
 
 addHook("profileLoaded", onProfileLoaded)
+
+setConfigEditor(configEditor)
