@@ -81,7 +81,7 @@ def boostSince():
         for cid in cardIds:
             card = col.getCard(cid)
             if isDeckWhitelisted(col, card.did):
-                newIvl = getBoostedInterval(col, card)
+                newIvl = getBoostedInterval(card, revlogMap[cid])
                 if newIvl:
                     boostList.append((card, newIvl))
 

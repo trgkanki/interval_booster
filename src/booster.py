@@ -32,7 +32,7 @@ def rescheduleWithInterval(col, card, newIvl):
     card.flush()
 
 
-def getBoostedInterval(col, card, revlogMap=None):
+def getBoostedInterval(card, revlogList=None):
     # Ignore cards during custom study
     if card.odid:
         return
@@ -41,7 +41,7 @@ def getBoostedInterval(col, card, revlogMap=None):
         return
 
     cid = card.id
-    revlogList = (revlogMap or getRevlogMap([cid]))[cid]
+    revlogList = revlogList or getRevlogMap([cid])[cid]
     lastReviewLog = revlogList[-1]
 
     # Ignore cards that have just finished custom studies

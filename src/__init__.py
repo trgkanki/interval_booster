@@ -47,13 +47,13 @@ from .configUI import configEditor
 setConfigEditor(configEditor)
 
 
-## ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Hooks for reviewer: new cards, reviewed cards
 
 
 def newLogRev(self, card, ease, delay, type, _old):
     _old(self, card, ease, delay, type)
-    newIvl = getBoostedInterval(self.col, card)
+    newIvl = getBoostedInterval(card)
     if newIvl:
         rescheduleWithInterval(self.col, card, newIvl)
 
@@ -64,7 +64,7 @@ SchedulerV2._logRev = wrap(SchedulerV2._logRev, newLogRev, "around")
 
 def newLogLrn(self, card, ease, conf, leaving, type, lastLeft, _old):
     _old(self, card, ease, conf, leaving, type, lastLeft)
-    newIvl = getBoostedInterval(self.col, card)
+    newIvl = getBoostedInterval(card)
     if newIvl:
         rescheduleWithInterval(self.col, card, newIvl)
 
@@ -73,7 +73,7 @@ SchedulerV1._logLrn = wrap(SchedulerV1._logLrn, newLogLrn, "around")
 SchedulerV2._logLrn = wrap(SchedulerV2._logLrn, newLogLrn, "around")
 
 
-## ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 
 def onProfileLoaded():
@@ -97,7 +97,7 @@ def onProfileLoaded():
         for cid in cardIds:
             card = col.getCard(cid)
             if isDeckWhitelisted(col, card.did):
-                newIvl = getBoostedInterval(col, card)
+                newIvl = getBoostedInterval(card, revlogMap[cid])
                 if newIvl:
                     rescheduleWithInterval(col, card, newIvl)
 
@@ -124,7 +124,7 @@ def newLoadProfile(self, onsuccess=None, *, _old):
 
 AnkiQt.loadProfile = wrap(AnkiQt.loadProfile, newLoadProfile, "around")
 
-## ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Add menu
 
 action = QAction("Interval boost for reviews since...", mw)
