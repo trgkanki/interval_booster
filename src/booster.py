@@ -81,5 +81,9 @@ def getBoostedInterval(card, revlogList=None):
             newInterval = random.randint(
                 math.ceil(targetInterval * 0.9), math.floor(targetInterval * 1.1)
             )
+
+            # Always make newInterval different from lastReviewLog.ivl
+            if newInterval == lastReviewLog.ivl:
+                newInterval += 1
             return newInterval
         return

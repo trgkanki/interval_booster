@@ -39,9 +39,11 @@ from .revlog.extractor import getRevlogMap
 from .booster import rescheduleWithInterval, getBoostedInterval
 
 from .deckWhitelist import isDeckWhitelisted
-from .boostSince import boostSince
+from .boostSince import boostSince, boostSinceGUI
 
 from .configUI import configEditor
+
+import time
 
 
 setConfigEditor(configEditor)
@@ -76,46 +78,24 @@ SchedulerV2._logLrn = wrap(SchedulerV2._logLrn, newLogLrn, "around")
 # ----------------------------------------------------------------------------
 
 
-def onProfileLoaded():
+def onStartupOrSync():
     invalidateInitialIvlTable()
-
-    _lastProcessedRevlogId = getConfig("_lastProcessedRevlogId", None)
-    if _lastProcessedRevlogId is not None:
-        assert type(_lastProcessedRevlogId) in [int, float]
-
-        col = mw.col
-        rows = col.db.all(
-            "select id, cid from revlog where id > %f" % (_lastProcessedRevlogId)
-        )
-        if not rows:
-            return
-
-        cardIds = set(cid for _id, cid in rows)  # Select unique cardIds
-        log("Rescheduling %d new reviews on startup" % len(cardIds))
-
-        revlogMap = getRevlogMap()
-        for cid in cardIds:
-            card = col.getCard(cid)
-            if isDeckWhitelisted(col, card.did):
-                newIvl = getBoostedInterval(card, revlogMap[cid])
-                if newIvl:
-                    rescheduleWithInterval(col, card, newIvl)
-
-        _lastProcessedRevlogId = max(_id for _id, cid in rows)
-        setConfig("_lastProcessedRevlogId", _lastProcessedRevlogId)
+    boostSince(time.time() - 86400 * 7)
 
 
 # rather than using profileloaded, we hook up `loadProfile` instead.
 # This is due `profileLoaded` hook being called before sync.
 # Maybe one want to modify card content on other device, but this addon may
 # overwrite new interval BEFORE sync, effectively invalidating that modification.
+
+
 def newLoadProfile(self, onsuccess=None, *, _old):
     def newOnSuccess():
         if not self.col:
             # Profile load failed for some reason
             return
 
-        onProfileLoaded()
+        onStartupOrSync()
         if onsuccess():
             onsuccess()
 
@@ -128,5 +108,5 @@ AnkiQt.loadProfile = wrap(AnkiQt.loadProfile, newLoadProfile, "around")
 # Add menu
 
 action = QAction("Interval boost for reviews since...", mw)
-action.triggered.connect(boostSince)
+action.triggered.connect(boostSinceGUI)
 mw.form.menuTools.addAction(action)

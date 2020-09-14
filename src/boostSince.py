@@ -38,7 +38,7 @@ from .qdlg import (
 
 from PyQt5.Qt import QDate
 from aqt import mw
-from aqt.utils import showInfo, askUser
+from aqt.utils import tooltip
 from .utils.log import log
 import datetime
 
@@ -63,7 +63,7 @@ def dateSelector(dlg, ret):
         Button("Cancel").onClick(lambda: dlg.reject())
 
 
-def boostSince():
+def boostSinceGUI():
     ret = [None]
 
     if dateSelector.run(ret) and ret[0]:
@@ -71,27 +71,28 @@ def boostSince():
         since = datetime.datetime(
             date.year(), date.month(), date.day(), 0, 0
         ).timestamp()
-        col = mw.col
+        boostSince(since)
 
-        rows = col.db.all("select id, cid from revlog where id >= %d" % (since * 1000))
-        cardIds = set(cid for _id, cid in rows)  # Select unique cardIds
 
-        revlogMap = getRevlogMap()
-        boostList = []
-        for cid in cardIds:
-            card = col.getCard(cid)
-            if isDeckWhitelisted(col, card.did):
-                newIvl = getBoostedInterval(card, revlogMap[cid])
-                if newIvl:
-                    boostList.append((card, newIvl))
+def boostSince(sinceEpoch):
+    col = mw.col
+    rows = col.db.all("select id, cid from revlog where id >= %d" % (sinceEpoch * 1000))
+    cardIds = set(cid for _id, cid in rows)  # Select unique cardIds
 
-        if not boostList:
-            showInfo("No card needs rescheduling")
-            return
+    revlogMap = getRevlogMap()
+    boostList = []
+    for cid in cardIds:
+        card = col.getCard(cid)
+        if isDeckWhitelisted(col, card.did):
+            newIvl = getBoostedInterval(card, revlogMap[cid])
+            if newIvl:
+                boostList.append((card, newIvl))
 
-        if not askUser("%d card may need rescheduling. Proceed?" % len(boostList)):
-            return
+    if not boostList:
+        return
 
-        log("Rescheduling %d reviews: user request" % len(boostList))
-        for card, newIvl in boostList:
-            rescheduleWithInterval(col, card, newIvl)
+    log("Rescheduling %d reviews: user request" % len(boostList))
+    for card, newIvl in boostList:
+        rescheduleWithInterval(col, card, newIvl)
+
+    tooltip("[Induction booster] Rescheduled %d cards" % len(boostList))

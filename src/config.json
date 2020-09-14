@@ -1,6 +1,5 @@
 {
-    "targetRetentionRate": 0.85,
-    "sampleDays": 60,
-    "whitelistDecks": [],
-    "_lastProcessedRevlogId": null
+  "targetRetentionRate": 0.85,
+  "sampleDays": 60,
+  "whitelistDecks": []
 }
