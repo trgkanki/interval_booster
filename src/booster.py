@@ -48,6 +48,10 @@ def getBoostedInterval(card, revlogList=None):
     if lastReviewLog.reviewType == REVLOG_TYPE_CRAM:
         return
 
+    # Still in learning/relearning phase → pass
+    if lastReviewLog.ivl < 0:
+        return
+
     # Interval already modified
     if lastReviewLog.ivl != card.ivl:
         return
