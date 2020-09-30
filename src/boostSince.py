@@ -82,7 +82,11 @@ def boostSince(sinceEpoch):
     revlogMap = getRevlogMap()
     boostList = []
     for cid in cardIds:
-        card = col.getCard(cid)
+        try:
+            card = col.getCard(cid)
+        except (AssertionError, KeyError, IndexError):
+            # Card might have been deleted after reviews
+            continue
         if isDeckWhitelisted(col, card.did):
             newIvl = getBoostedInterval(card, revlogMap[cid])
             if newIvl:
