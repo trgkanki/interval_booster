@@ -44,7 +44,7 @@ import datetime
 
 from .deckWhitelist import isDeckWhitelisted
 from .revlog.extractor import getRevlogMap
-from .booster import rescheduleWithInterval, getBoostedInterval
+from .booster import rescheduleWithIntervalFactor, getBoostedIntervalFactor
 
 
 @QDlg("Reschedule cards since...", (300, 300))
@@ -88,15 +88,15 @@ def boostSince(sinceEpoch):
             # Card might have been deleted after reviews
             continue
         if isDeckWhitelisted(col, card.did):
-            newIvl = getBoostedInterval(card, revlogMap[cid])
-            if newIvl:
-                boostList.append((card, newIvl))
+            newIvlFactor = getBoostedIntervalFactor(card, revlogMap[cid])
+            if newIvlFactor:
+                boostList.append((card, newIvlFactor))
 
     if not boostList:
         return
 
     log("Rescheduling %d reviews: user request" % len(boostList))
-    for card, newIvl in boostList:
-        rescheduleWithInterval(col, card, newIvl)
+    for card, newIvlFactor in boostList:
+        rescheduleWithIntervalFactor(col, card, newIvlFactor)
 
     tooltip("[Induction booster] Rescheduled %d cards" % len(boostList))

@@ -1,5 +1,11 @@
 {
   "targetRetentionRate": 0.85,
   "sampleDays": 60,
-  "whitelistDecks": []
+  "whitelistDecks": [],
+  "autoEaseConfig": {
+    "leash": 100,
+    "maxEase": 5000,
+    "minEase": 1000,
+    "movingAverageWeight": 0.2
+  }
 }
