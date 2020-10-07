@@ -96,7 +96,7 @@ def newLoadProfile(self, onsuccess=None, *, _old):
             return
 
         onStartupOrSync()
-        if onsuccess():
+        if onsuccess:
             onsuccess()
 
     _old(self, newOnSuccess)
