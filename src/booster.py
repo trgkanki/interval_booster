@@ -3,6 +3,7 @@ from .revlog.initialIvl import initialIvl
 
 from .utils.log import log
 from .utils.configrw import getConfig
+from .autoease import recalculateCardEase
 
 from .consts import (
     REVLOG_TYPE_NEW,
@@ -18,21 +19,27 @@ import random
 import math
 
 
-def rescheduleWithInterval(col, card, newIvl):
-    if card.ivl == newIvl:
-        # log("  [ skipping: identical ivl ]")
+def rescheduleWithIntervalFactor(col, card, newIvlFactor):
+    newIvl, newFactor = newIvlFactor
+    if not newIvl and not newFactor:
         return
 
-    log(" - Rescheduling cid=%d: ivl %d->%d" % (card.id, card.ivl, newIvl))
+    log(
+        " - Rescheduling cid=%d: ivl %s->%s, factor %s->%s"
+        % (card.id, card.ivl, newIvl, card.factor, newFactor)
+    )
 
-    card.due = card.due - card.ivl + newIvl
-    card.ivl = newIvl
+    if newIvl:
+        card.due = card.due - card.ivl + newIvl
+        card.ivl = newIvl
+    if newFactor:
+        card.factor = newFactor
     card.mod = intTime()
     card.usn = col.usn()
     card.flush()
 
 
-def getBoostedInterval(card, revlogList=None):
+def getBoostedIntervalFactor(card, revlogList=None):
     # Ignore cards during custom study
     if card.odid:
         return
@@ -48,11 +55,16 @@ def getBoostedInterval(card, revlogList=None):
     if lastReviewLog.reviewType == REVLOG_TYPE_CRAM:
         return
 
-    # Interval already modified
-    if lastReviewLog.ivl != card.ivl:
+    # Still in learning/relearning phase → pass
+    if lastReviewLog.ivl < 0:
         return
 
-    # Graduating from initial
+    # Interval or easeFactor already modified
+    # Maybe, already have been boosted!
+    if lastReviewLog.ivl != card.ivl or lastReviewLog.factor != card.factor:
+        return
+
+    # Graduating from initial induction
     if (
         lastReviewLog.reviewType == REVLOG_TYPE_NEW
         and card.ivl > 0
@@ -63,27 +75,31 @@ def getBoostedInterval(card, revlogList=None):
             log(
                 "initial boost: cid=%d, initialInterval=%d" % (card.id, initialInterval)
             )
-            return initialInterval
+            return initialInterval, None
         return
 
-    # Young card interval booster
-    # Pressed 'good'
-    if lastReviewLog.reviewType == REVLOG_TYPE_REVIEW and lastReviewLog.ease == 3:
-        origInterval = lastReviewLog.ivl
-        if lastReviewLog.ivl < 10:
-            targetInterval = origInterval * 2
+    # Boost after review
+    if lastReviewLog.reviewType == REVLOG_TYPE_REVIEW:
+        newFactor = recalculateCardEase(revlogList)
+
+        # Always make newFactor different from lastReviewLog.factor
+        # Offset by 0.1% won't make much difference.
+        if newFactor == lastReviewLog.factor:
+            newFactor += 1
+
+        # Recalculate interval according to new factor
+        if lastReviewLog.ease == 1:
+            # Don't recalculate interval for easy cards
+            newIvl = None
+
+        elif lastReviewLog.ease == 2:
+            # Hard cards have their next interval adjusted independent of card's ease factor
+            # so don't modify interval here
+            newIvl = None
+
         else:
-            targetInterval = 10 * 2 + (origInterval - 10)
-        realInterval = card.ivl
-        if not (targetInterval - 1 <= realInterval <= targetInterval + 1) and not (
-            targetInterval * 0.9 <= realInterval <= targetInterval * 1.1
-        ):
-            newInterval = random.randint(
-                math.ceil(targetInterval * 0.9), math.floor(targetInterval * 1.1)
-            )
+            lastIvl = lastReviewLog.lastIvl
+            ivl = lastReviewLog.ivl
+            newIvl = max(lastIvl + 1, int(ivl / lastReviewLog.factor * newFactor + 0.5))
 
-            # Always make newInterval different from lastReviewLog.ivl
-            if newInterval == lastReviewLog.ivl:
-                newInterval += 1
-            return newInterval
-        return
+        return newIvl, newFactor

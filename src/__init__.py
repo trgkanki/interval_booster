@@ -36,7 +36,7 @@ from .utils.log import log
 
 from .revlog.initialIvl import invalidateInitialIvlTable
 from .revlog.extractor import getRevlogMap
-from .booster import rescheduleWithInterval, getBoostedInterval
+from .booster import rescheduleWithIntervalFactor, getBoostedIntervalFactor
 
 from .deckWhitelist import isDeckWhitelisted
 from .boostSince import boostSince, boostSinceGUI
@@ -55,9 +55,9 @@ setConfigEditor(configEditor)
 
 def newLogRev(self, card, ease, delay, type, _old):
     _old(self, card, ease, delay, type)
-    newIvl = getBoostedInterval(card)
-    if newIvl:
-        rescheduleWithInterval(self.col, card, newIvl)
+    newIvlFactor = getBoostedIntervalFactor(card)
+    if newIvlFactor:
+        rescheduleWithIntervalFactor(self.col, card, newIvlFactor)
 
 
 SchedulerV1._logRev = wrap(SchedulerV1._logRev, newLogRev, "around")
@@ -66,9 +66,9 @@ SchedulerV2._logRev = wrap(SchedulerV2._logRev, newLogRev, "around")
 
 def newLogLrn(self, card, ease, conf, leaving, type, lastLeft, _old):
     _old(self, card, ease, conf, leaving, type, lastLeft)
-    newIvl = getBoostedInterval(card)
-    if newIvl:
-        rescheduleWithInterval(self.col, card, newIvl)
+    newIvlFactor = getBoostedIntervalFactor(card)
+    if newIvlFactor:
+        rescheduleWithIntervalFactor(self.col, card, newIvlFactor)
 
 
 SchedulerV1._logLrn = wrap(SchedulerV1._logLrn, newLogLrn, "around")
