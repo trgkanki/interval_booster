@@ -1,9 +1,9 @@
 from .revlog.extractor import getRevlogMap
 from .revlog.initialIvl import initialIvl
+from .revlog.autoease import recalculateCardEase
 
 from .utils.log import log
 from .utils.configrw import getConfig
-from .autoease import recalculateCardEase
 
 from .consts import (
     REVLOG_TYPE_NEW,

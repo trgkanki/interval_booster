@@ -27,8 +27,8 @@ import math
 from typing import Union, List
 from collections import namedtuple
 
-from .utils.configrw import getConfig
-from .revlog.extractor import RevlogEntry
+from ..utils.configrw import getConfig
+from .extractor import RevlogEntry
 
 
 def movingAverage(values, movingAverageWeight, init=None):
