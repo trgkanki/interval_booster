@@ -104,4 +104,4 @@ def boostSince(sinceEpoch, force=False):
     for card, newIvlFactor in boostList:
         rescheduleWithIntervalFactor(col, card, newIvlFactor)
 
-    tooltip("[Induction booster] Rescheduled %d cards" % len(boostList))
+    tooltip("[Interval booster] Rescheduled %d cards" % len(boostList))

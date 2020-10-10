@@ -39,6 +39,12 @@ def rescheduleWithIntervalFactor(col, card, newIvlFactor):
     card.flush()
 
 
+def youngCardBoostedFactor(factor, interval):
+    if interval <= 20:
+        factor = int(factor * (2 - interval * 0.05))
+    return factor
+
+
 def getBoostedIntervalFactor(card, revlogList=None, force=False):
     # Ignore cards during custom study
     if card.odid:
@@ -77,12 +83,17 @@ def getBoostedIntervalFactor(card, revlogList=None, force=False):
             log(
                 "initial boost: cid=%d, initialInterval=%d" % (card.id, initialInterval)
             )
-            return initialInterval, lastReviewLog.factor
+            factor = youngCardBoostedFactor(lastReviewLog.factor, initialInterval)
+            return initialInterval, factor
         return
 
     # Boost after review
     if lastReviewLog.reviewType == REVLOG_TYPE_REVIEW:
         newFactor = recalculateCardEase(revlogList)
+
+        # Boost factor for young cards
+        # this formula is empirical. There might be a better one.
+        newFactor = youngCardBoostedFactor(newFactor, lastReviewLog.ivl)
 
         # Always make newFactor different from lastReviewLog.factor
         # This is adding 0.1% to factor. 0.1% won't make much difference.
