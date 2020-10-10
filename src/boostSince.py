@@ -56,6 +56,11 @@ def dateSelector(dlg, ret):
     with Table():
         with Tr():
             with Td():
+                Text(
+                    "Note: this will reschedule all cards reviewed since selected date with your settings, even those that were already rescheduled."
+                ).wordWrap(True)
+        with Tr():
+            with Td():
                 cal = Calendar().onChange(onDateChange)
 
     with HStack():
@@ -71,10 +76,10 @@ def boostSinceGUI():
         since = datetime.datetime(
             date.year(), date.month(), date.day(), 0, 0
         ).timestamp()
-        boostSince(since)
+        boostSince(since, True)
 
 
-def boostSince(sinceEpoch):
+def boostSince(sinceEpoch, force=False):
     col = mw.col
     rows = col.db.all("select id, cid from revlog where id >= %d" % (sinceEpoch * 1000))
     cardIds = set(cid for _id, cid in rows)  # Select unique cardIds
@@ -88,7 +93,7 @@ def boostSince(sinceEpoch):
             # Card might have been deleted after reviews
             continue
         if isDeckWhitelisted(col, card.did):
-            newIvlFactor = getBoostedIntervalFactor(card, revlogMap[cid])
+            newIvlFactor = getBoostedIntervalFactor(card, revlogMap[cid], force)
             if newIvlFactor:
                 boostList.append((card, newIvlFactor))
 
