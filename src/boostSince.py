@@ -89,7 +89,7 @@ def boostSince(sinceEpoch, force=False):
     for cid in cardIds:
         try:
             card = col.getCard(cid)
-        except (AssertionError, KeyError, IndexError):
+        except:
             # Card might have been deleted after reviews
             continue
         if isDeckWhitelisted(col, card.did):
