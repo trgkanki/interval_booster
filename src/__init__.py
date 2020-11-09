@@ -31,7 +31,7 @@ from aqt.main import AnkiQt
 
 from .utils import uuid  # duplicate UUID checked here
 from .utils import openChangelog
-from .utils.configrw import getConfig, setConfig, setConfigEditor
+from .utils.configrw import getConfig, setConfig
 from .utils.log import log
 
 from .revlog.initialIvl import invalidateInitialIvlTable
@@ -41,12 +41,7 @@ from .booster import rescheduleWithIntervalFactor, getBoostedIntervalFactor
 from .deckWhitelist import isDeckWhitelisted
 from .boostSince import boostSince, boostSinceGUI
 
-from .configUI import configEditor
-
 import time
-
-
-setConfigEditor(configEditor)
 
 
 # ----------------------------------------------------------------------------
