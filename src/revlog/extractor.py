@@ -22,13 +22,16 @@ def getRevlogMap(cardIds=None):
     col = aqt.mw.col
 
     rows = col.db.all(query)
+    # This seemingly innocent attribute query issues python ↔ rust barrier cross
+    # every time, so this property getter shouldn't be inside the loop.
+    colCrt = col.crt
     for row in rows:
         epoch, cid, usn, ease, ivl, lastIvl, factor, duration, reviewType = row
         if cid not in revlogMap:
             revlogMap[cid] = []
 
         # Convert to days since col.crt
-        epoch = (epoch / 1000 - col.crt) / 86400  # ms to day
+        epoch = (epoch / 1000 - colCrt) / 86400  # ms to day
         revlogMap[cid].append(
             RevlogEntry(reviewType, ease, epoch, ivl, lastIvl, factor)
         )

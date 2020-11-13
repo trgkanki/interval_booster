@@ -86,22 +86,36 @@ def boostSince(sinceEpoch, force=False):
 
     revlogMap = getRevlogMap()
     boostList = []
-    for cid in cardIds:
-        try:
-            card = col.getCard(cid)
-        except:
-            # Card might have been deleted after reviews
-            continue
-        if isDeckWhitelisted(col, card.did):
-            newIvlFactor = getBoostedIntervalFactor(card, revlogMap[cid], force)
-            if newIvlFactor:
-                boostList.append((card, newIvlFactor))
 
-    if not boostList:
-        return
+    progress = mw.progress
+    progress.start(
+        immediate=True, min=0, max=len(cardIds), label="Interval boosting..."
+    )
+    try:
+        for i, cid in enumerate(cardIds):
+            progress.update(value=i, max=len(cardIds))
+            if i % 50 == 0:
+                # Make app responsive at least.
+                mw.app.processEvents()
 
-    log("Rescheduling %d reviews: user request" % len(boostList))
-    for card, newIvlFactor in boostList:
-        rescheduleWithIntervalFactor(col, card, newIvlFactor)
+            try:
+                card = col.getCard(cid)
+            except:
+                # Card might have been deleted after reviews
+                continue
+            if isDeckWhitelisted(col, card.did):
+                newIvlFactor = getBoostedIntervalFactor(card, revlogMap[cid], force)
+                if newIvlFactor:
+                    boostList.append((card, newIvlFactor))
 
-    tooltip("[Interval booster] Rescheduled %d cards" % len(boostList))
+        if not boostList:
+            return
+
+        log("Rescheduling %d reviews: user request" % len(boostList))
+        for card, newIvlFactor in boostList:
+            rescheduleWithIntervalFactor(col, card, newIvlFactor)
+
+        tooltip("[Interval booster] Rescheduled %d cards" % len(boostList))
+
+    finally:
+        progress.finish()
