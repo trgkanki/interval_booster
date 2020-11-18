@@ -15,7 +15,7 @@
 
 # -*- coding: utf-8 -*-
 #
-# interval_booster v20.10.12i24
+# interval_booster v20.11.18i164
 #
 # Copyright: trgk (phu54321@naver.com)
 # License: GNU AGPL, version 3 or later;

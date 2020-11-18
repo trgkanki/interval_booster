@@ -1,6 +1,6 @@
 {
   "name": "interval_booster",
-  "version": "20.10.12i24",
+  "version": "20.11.18i164",
   "description": "template for trgkanki's addon",
   "scripts": {
     "postinstall": "python3 -m pip install -r requirements.txt",
