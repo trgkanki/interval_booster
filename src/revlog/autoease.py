@@ -68,7 +68,7 @@ def recalculateCardEase(cardRevlogList: List[RevlogEntry]):
     if reviewCorrectList is None or len(reviewCorrectList) < 1:
         successRate = targetRetentionRate
     else:
-        successList = [int(_ > 1) for _ in reviewCorrectList]
+        successList = [1 if correct else 0 for correct in reviewCorrectList]
         successRate = movingAverage(
             successList, movingAverageWeight, init=targetRetentionRate
         )
