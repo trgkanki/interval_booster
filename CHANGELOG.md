@@ -2,6 +2,10 @@
 
 [comment]: # (DO NOT MODIFY. new changelog goes here)
 
+## 20.11.22i88 (2020-11-22)
+
+fix: ease always set to 150%
+
 ## 20.11.18i164 (2020-11-19)
 
 - fix: removed young card boost. it were too unstable
