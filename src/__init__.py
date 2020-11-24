@@ -33,6 +33,7 @@ from .utils import uuid  # duplicate UUID checked here
 from .utils import openChangelog
 from .utils.configrw import getConfig, setConfig
 from .utils.log import log
+from .utils import debugLog  # debug log registered here
 
 from .revlog.initialIvl import invalidateInitialIvlTable
 from .revlog.extractor import getRevlogMap
