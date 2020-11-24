@@ -46,6 +46,8 @@ from .deckWhitelist import isDeckWhitelisted
 from .revlog.extractor import getRevlogMap
 from .booster import rescheduleWithIntervalFactor, getBoostedIntervalFactor
 
+import anki
+
 
 @QDlg("Reschedule cards since...", (300, 300))
 def dateSelector(dlg, ret):
@@ -93,7 +95,13 @@ def boostSince(sinceEpoch, force=False):
     )
     try:
         for i, cid in enumerate(cardIds):
-            progress.update(value=i, max=len(cardIds))
+
+            try:
+                progress.update(value=i, max=len(cardIds))
+            except TypeError:
+                # Anki ~2.1.27 doesn't have keyword argument 'max' for progress bar.
+                progress.update(value=i)
+
             if i % 50 == 0:
                 # Make app responsive at least.
                 mw.app.processEvents()
