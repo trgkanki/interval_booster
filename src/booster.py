@@ -82,7 +82,7 @@ def getBoostedIntervalFactor(card, revlogList=None, force=False):
 
     # Boost after review
     if lastReviewLog.reviewType == REVLOG_TYPE_REVIEW:
-        newFactor = recalculateCardEase(revlogList)
+        newFactor = recalculateCardEase(cid, revlogList)
 
         # Boost factor for young cards
         # this formula is empirical. There might be a better one.

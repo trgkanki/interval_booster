@@ -29,6 +29,7 @@ from collections import namedtuple
 
 from ..utils.configrw import getConfig
 from .extractor import RevlogEntry
+from .targetRetentionRate import getTargetRetentionRate
 
 
 def movingAverage(values, movingAverageWeight, init=None):
@@ -44,14 +45,14 @@ def movingAverage(values, movingAverageWeight, init=None):
     return movingAvg
 
 
-def recalculateCardEase(cardRevlogList: List[RevlogEntry]):
+def recalculateCardEase(cid: int, cardRevlogList: List[RevlogEntry]):
     """Return next ease factor based on config and card performance."""
 
     # Read config
     config = getConfig("autoEaseConfig")
 
     leash = config.get("leash", 100)
-    targetRetentionRate = getConfig("targetRetentionRate")
+    targetRetentionRate = getTargetRetentionRate(cid)
     maxEase = config.get("maxEase", 5000)
     minEase = config.get("minEase", 1000)
     movingAverageWeight = config.get("movingAverageWeight")
