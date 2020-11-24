@@ -1,16 +1,19 @@
 from aqt import mw
-from ..utils.configrw import getConfig
+from ..utils.configrw import getConfig, onConfigUpdate
 
 
 _retentionRateDefault = None
 _retentionRateOverrides = None
 
 
-def _initCache():
+def _initCache(force=False):
     global _retentionRateDefault, _retentionRateOverrides
-    if _retentionRateDefault is None:
+    if force or _retentionRateDefault is None:
         _retentionRateDefault = getConfig("targetRetentionRate")
         _retentionRateOverrides = getConfig("targetRetentionRateOverrides")
+
+
+onConfigUpdate(lambda: _initCache(True))
 
 
 def getTargetRetentionRate(cid: int):
