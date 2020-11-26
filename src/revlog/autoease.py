@@ -29,7 +29,7 @@ from collections import namedtuple
 
 from ..consts import REVLOG_TYPE_REVIEW
 from ..utils.configrw import getConfig
-from ..utils.log import log
+from ..utils.debugLog import log
 from .extractor import RevlogEntry
 from .targetRetentionRate import getTargetRetentionRate
 

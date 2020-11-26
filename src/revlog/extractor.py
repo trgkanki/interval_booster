@@ -1,7 +1,7 @@
 import os
 import math
 from collections import namedtuple
-from ..utils.log import log
+from ..utils.debugLog import log
 
 import aqt
 from anki.utils import ids2str

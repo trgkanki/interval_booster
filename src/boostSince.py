@@ -39,7 +39,7 @@ from .qdlg import (
 from PyQt5.Qt import QDate
 from aqt import mw
 from aqt.utils import tooltip
-from .utils.log import log
+from .utils.debugLog import log
 import datetime
 
 from .deckWhitelist import isDeckWhitelisted
