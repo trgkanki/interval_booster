@@ -2,6 +2,11 @@
 
 [comment]: # (DO NOT MODIFY. new changelog goes here)
 
+## 20.11.28i117 (2020-11-28)
+
+- Feature: You can now adjust target retention rate for your selected cards! Use `targetRetentionRateOverrides` addon option.
+- Fix: Better ease adjustment for review cards.
+
 ## 20.11.22i88 (2020-11-22)
 
 fix: ease always set to 150%
