@@ -428,3 +428,5 @@ meta.json
 
 # gitignore testing zone
 rranalysis
+
+.vscode
