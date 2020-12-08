@@ -1,4 +1,5 @@
 {
+  "debug": false,
   "targetRetentionRate": 0.85,
   "targetRetentionRateOverrides": [],
   "sampleDays": 60,

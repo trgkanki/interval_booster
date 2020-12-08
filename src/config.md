@@ -14,6 +14,8 @@
   Later entries will have more precedence over former ones.
   > Note that this won't affect newly learnt cards.
 
+- **debug**: addon debug mode. Debug log will be accessible `Help` menu.
+
 ## autoEaseConfig
 
 Imported code from [Auto Ease Factor](https://ankiweb.net/shared/info/1672712021) addons.

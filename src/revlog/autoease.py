@@ -27,7 +27,9 @@ import math
 from typing import Union, List
 from collections import namedtuple
 
+from ..consts import REVLOG_TYPE_REVIEW
 from ..utils.configrw import getConfig
+from ..utils.debugLog import log
 from .extractor import RevlogEntry
 from .targetRetentionRate import getTargetRetentionRate
 
@@ -61,9 +63,16 @@ def recalculateCardEase(cid: int, cardRevlogList: List[RevlogEntry]):
     lastRevlog = cardRevlogList[-1]
     currentFactor = lastRevlog.factor
 
+    log("analyzing card %d" % cid)
     cardRevlogList = cardRevlogList[:-1]
-    factorList = [revlog.factor for revlog in cardRevlogList if revlog.factor > 0]
+    cardRevlogList = [
+        log for log in cardRevlogList if log.reviewType == REVLOG_TYPE_REVIEW
+    ]
+    factorList = [revlog.factor for revlog in cardRevlogList]
     reviewCorrectList = [revlog.ease > 1 for revlog in cardRevlogList]
+    log(" - cardRevlogList: %s" % cardRevlogList)
+    log(" - factorList: %s" % factorList)
+    log(" - reviewCorrectList: %s" % reviewCorrectList)
 
     # if no reviews, just assume we're on targetRetentionRate
     if reviewCorrectList is None or len(reviewCorrectList) < 1:
@@ -73,6 +82,8 @@ def recalculateCardEase(cid: int, cardRevlogList: List[RevlogEntry]):
         successRate = movingAverage(
             successList, movingAverageWeight, init=targetRetentionRate
         )
+
+    log(" - successRate: %s" % successRate)
 
     # Ebbinghaus formula
     if successRate > 0.99:
@@ -92,6 +103,7 @@ def recalculateCardEase(cid: int, cardRevlogList: List[RevlogEntry]):
         # factor. Set averageFactor to that.
         averageFactor = currentFactor
     suggestedFactor = int(round(averageFactor * deltaRatio))
+    log(" - suggestedFactor: %s" % suggestedFactor)
 
     # anchor this to currentFactor initially
     reviewCount = len(reviewCorrectList)
@@ -101,5 +113,7 @@ def recalculateCardEase(cid: int, cardRevlogList: List[RevlogEntry]):
     minAllowedFactor = max(minEase, (currentFactor - (leash * reviewCount)))
     if suggestedFactor < minAllowedFactor:
         suggestedFactor = minAllowedFactor
+
+    log(" - adjusted suggestedFactor: %s" % suggestedFactor)
 
     return suggestedFactor

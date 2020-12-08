@@ -2,7 +2,7 @@ from .revlog.extractor import getRevlogMap
 from .revlog.initialIvl import initialIvl
 from .revlog.autoease import recalculateCardEase
 
-from .utils.log import log
+from .utils.debugLog import log
 from .utils.configrw import getConfig
 
 from .consts import (

@@ -15,7 +15,7 @@
 
 # -*- coding: utf-8 -*-
 #
-# interval_booster v20.11.22i88
+# interval_booster v20.11.28i117
 #
 # Copyright: trgk (phu54321@naver.com)
 # License: GNU AGPL, version 3 or later;
@@ -32,7 +32,7 @@ from aqt.main import AnkiQt
 from .utils import uuid  # duplicate UUID checked here
 from .utils import openChangelog
 from .utils.configrw import getConfig, setConfig
-from .utils.log import log
+from .utils.debugLog import log
 from .utils import debugLog  # debug log registered here
 
 from .revlog.initialIvl import invalidateInitialIvlTable

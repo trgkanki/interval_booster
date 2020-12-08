@@ -1,7 +1,7 @@
 from aqt import mw
 
 from ..utils.configrw import getConfig
-from ..utils.log import log
+from ..utils.debugLog import log
 from .extractor import getRevlogMap
 
 from ..consts import REVLOG_TYPE_NEW
