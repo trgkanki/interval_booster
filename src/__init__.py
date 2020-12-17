@@ -23,7 +23,8 @@
 
 from anki.sched import Scheduler as SchedulerV1
 from anki.schedv2 import Scheduler as SchedulerV2
-from anki.hooks import wrap, addHook
+from anki.hooks import wrap
+from aqt import gui_hooks
 
 from aqt import mw
 from aqt.qt import QAction
@@ -91,7 +92,9 @@ def newLoadProfile(self, onsuccess=None, *, _old):
             # Profile load failed for some reason
             return
 
-        onStartupOrSync()
+        if not self.pm.auto_syncing_enabled():
+            onStartupOrSync()
+
         if onsuccess:
             onsuccess()
 
@@ -99,6 +102,7 @@ def newLoadProfile(self, onsuccess=None, *, _old):
 
 
 AnkiQt.loadProfile = wrap(AnkiQt.loadProfile, newLoadProfile, "around")
+gui_hooks.sync_did_finish.append(onStartupOrSync)
 
 # ----------------------------------------------------------------------------
 # Add menu
