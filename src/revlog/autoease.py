@@ -63,16 +63,16 @@ def recalculateCardEase(cid: int, cardRevlogList: List[RevlogEntry]):
     lastRevlog = cardRevlogList[-1]
     currentFactor = lastRevlog.factor
 
-    log("analyzing card %d" % cid)
+    # log("analyzing card %d" % cid)
     cardRevlogList = cardRevlogList[:-1]
     cardRevlogList = [
         log for log in cardRevlogList if log.reviewType == REVLOG_TYPE_REVIEW
     ]
     factorList = [revlog.factor for revlog in cardRevlogList]
     reviewCorrectList = [revlog.ease > 1 for revlog in cardRevlogList]
-    log(" - cardRevlogList: %s" % cardRevlogList)
-    log(" - factorList: %s" % factorList)
-    log(" - reviewCorrectList: %s" % reviewCorrectList)
+    # log(" - cardRevlogList: %s" % cardRevlogList)
+    # log(" - factorList: %s" % factorList)
+    # log(" - reviewCorrectList: %s" % reviewCorrectList)
 
     # if no reviews, just assume we're on targetRetentionRate
     if reviewCorrectList is None or len(reviewCorrectList) < 1:
@@ -83,7 +83,7 @@ def recalculateCardEase(cid: int, cardRevlogList: List[RevlogEntry]):
             successList, movingAverageWeight, init=targetRetentionRate
         )
 
-    log(" - successRate: %s" % successRate)
+    # log(" - successRate: %s" % successRate)
 
     # Ebbinghaus formula
     if successRate > 0.99:
@@ -103,7 +103,7 @@ def recalculateCardEase(cid: int, cardRevlogList: List[RevlogEntry]):
         # factor. Set averageFactor to that.
         averageFactor = currentFactor
     suggestedFactor = int(round(averageFactor * deltaRatio))
-    log(" - suggestedFactor: %s" % suggestedFactor)
+    # log(" - suggestedFactor: %s" % suggestedFactor)
 
     # anchor this to currentFactor initially
     reviewCount = len(reviewCorrectList)
@@ -114,6 +114,6 @@ def recalculateCardEase(cid: int, cardRevlogList: List[RevlogEntry]):
     if suggestedFactor < minAllowedFactor:
         suggestedFactor = minAllowedFactor
 
-    log(" - adjusted suggestedFactor: %s" % suggestedFactor)
+    # log(" - adjusted suggestedFactor: %s" % suggestedFactor)
 
     return suggestedFactor
