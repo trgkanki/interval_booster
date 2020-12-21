@@ -42,7 +42,7 @@ def invalidateInitialIvlTable():
 def initialIvl(revlogList):
     _initInitialIvlTable()
 
-    inductionLength = 1
+    inductionLength = 0
     for log in revlogList[::-1]:
         if log.reviewType == REVLOG_TYPE_NEW:
             inductionLength += 1
