@@ -127,3 +127,5 @@ def boostSince(sinceEpoch, force=False):
 
     finally:
         progress.finish()
+        # Possible remaining card count update
+        mw.reset()
