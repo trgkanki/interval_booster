@@ -5,6 +5,8 @@ from .revlog.autoease import recalculateCardEase
 from .utils.debugLog import log
 from .utils.configrw import getConfig
 
+from collections import defaultdict
+
 from .consts import (
     REVLOG_TYPE_NEW,
     REVLOG_TYPE_REVIEW,
@@ -19,10 +21,46 @@ import random
 import math
 
 
-def rescheduleWithIntervalFactor(col, card, newIvlFactor):
+def dueCardsCountTable(col, minDue, maxDue):
+    ret = defaultdict(lambda: 0)
+    ret.update(
+        col.db.all(
+            "select due, count() from cards where ? <= due and due <= ? group by due ",
+            minDue,
+            maxDue,
+        )
+    )
+    return ret
+
+
+def rescheduleWithIntervalFactor(col, card, newIvlFactor, useLoadBalancer=False):
     newIvl, newFactor = newIvlFactor
     if not newIvl and not newFactor:
         return
+
+    if useLoadBalancer:
+        loadBalanceFactor = getConfig("loadBalanceFactor")
+        if loadBalanceFactor:
+            today = col.sched.today
+            ivlDev = int(newIvl * 0.2 + 0.5)
+            minIvl = max(newIvl - ivlDev, 0)
+            maxIvl = newIvl + ivlDev
+            dueCounts = dueCardsCountTable(col, today + minIvl, today + maxIvl)
+            minDueCountIvl = -1
+            minDueCount = 999999999
+
+            for i in range(minIvl, maxIvl + 1):
+                # To position cards later as much as possible, we use >= instead of >.
+                # this doesn't add much, but anyway.
+                if minDueCount >= dueCounts[today + i]:
+                    minDueCount = dueCounts[today + i]
+                    minDueCountIvl = i
+
+            # log(
+            #     "lb: %d - %d %d %d %d"
+            #     % (card.id, newIvl, minIvl, maxIvl, minDueCountIvl)
+            # )
+            newIvl = minDueCountIvl
 
     log(
         " - Rescheduling cid=%d: ivl %s->%s, factor %s->%s"

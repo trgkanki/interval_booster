@@ -9,5 +9,6 @@
     "maxEase": 5000,
     "minEase": 1500,
     "movingAverageWeight": 0.2
-  }
+  },
+  "loadBalanceFactor": 0
 }

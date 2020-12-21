@@ -14,6 +14,10 @@
   Later entries will have more precedence over former ones.
   > Note that this won't affect newly learnt cards.
 
+- **loadBalanceFactor**: Allow up to `loadBalanceFactor` amount of adjustment to new card interval. (something like what you've seen on [here](https://ankiweb.net/shared/info/1417170896))
+  So, if this value is 0.2 and the new card's interval is calculated to 10 days, the card's actual new interval is determined to somewhere between 8~12 days, to where the least cards are
+  already positioned.
+
 - **debug**: addon debug mode. Debug log will be accessible `Help` menu.
 
 ## autoEaseConfig

@@ -54,7 +54,7 @@ def newLogRev(self, card, ease, delay, type, _old):
     _old(self, card, ease, delay, type)
     newIvlFactor = getBoostedIntervalFactor(card)
     if newIvlFactor:
-        rescheduleWithIntervalFactor(self.col, card, newIvlFactor)
+        rescheduleWithIntervalFactor(self.col, card, newIvlFactor, useLoadBalancer=True)
 
 
 SchedulerV1._logRev = wrap(SchedulerV1._logRev, newLogRev, "around")
@@ -65,7 +65,7 @@ def newLogLrn(self, card, ease, conf, leaving, type, lastLeft, _old):
     _old(self, card, ease, conf, leaving, type, lastLeft)
     newIvlFactor = getBoostedIntervalFactor(card)
     if newIvlFactor:
-        rescheduleWithIntervalFactor(self.col, card, newIvlFactor)
+        rescheduleWithIntervalFactor(self.col, card, newIvlFactor, useLoadBalancer=True)
 
 
 SchedulerV1._logLrn = wrap(SchedulerV1._logLrn, newLogLrn, "around")

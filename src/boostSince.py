@@ -121,7 +121,7 @@ def boostSince(sinceEpoch, force=False):
 
         log("Rescheduling %d reviews: user request" % len(boostList))
         for card, newIvlFactor in boostList:
-            rescheduleWithIntervalFactor(col, card, newIvlFactor)
+            rescheduleWithIntervalFactor(col, card, newIvlFactor, useLoadBalancer=True)
 
         tooltip("[Interval booster] Rescheduled %d cards" % len(boostList))
 
