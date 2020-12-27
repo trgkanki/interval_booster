@@ -38,7 +38,7 @@ def rescheduleWithIntervalFactor(col, card, newIvlFactor, useLoadBalancer=False)
     if not newIvl and not newFactor:
         return
 
-    if useLoadBalancer:
+    if newIvl and useLoadBalancer:
         loadBalanceFactor = getConfig("loadBalanceFactor")
         if loadBalanceFactor:
             today = col.sched.today
